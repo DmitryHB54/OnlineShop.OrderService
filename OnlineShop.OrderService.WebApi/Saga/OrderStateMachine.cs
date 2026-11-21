@@ -52,15 +52,12 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
 
         During(AwaitingPayment,
             When(PaymentProcessedEvent)
-                .TransitionTo(Completed)
-                .Finalize(),
+                .TransitionTo(Completed),
             When(PaymentFailedEvent)
                 .Then(context => context.Saga.FailureReason = context.Message.Reason)
                 // compensation: ReleaseStock
                 .TransitionTo(Failed)
                 .Finalize()
         );
-
-        SetCompletedWhenFinalized();
     }
 }
